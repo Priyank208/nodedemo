@@ -34,22 +34,22 @@ app.get('/users/:id',function(req,res){
 // Delete user
 app.get('/users/delete/:id',function(req,res){
 
-    let id  = parseInt(req.params.id);
-    users.find(function(item, i){      
-      if(item.id === id){
-        users.splice(i,1);
-        var json = JSON.stringify(users);
-        fs.writeFile("user.json", json, function(err) {
-            if(err) {
-                return res.send({"status" : "Fail","error" : err });  
-            }else{
-              return res.send({"status" : "Success","data" : users });  
-            }
-        });
-      }
-    });   
+    let userid  = parseInt(req.params.id);
+    let index = users.findIndex(function(userdata) { return userdata.id == userid; });
+    if(index){
+      users.splice(index,1);
+      var json = JSON.stringify(users);
+      fs.writeFile("user.json", json, function(err) {
+          if(err) {
+              return res.send({"status" : "Fail","error" : err });  
+          }else{
+            return res.send({"status" : "Success","data" : users });  
+          }
+      });
+    }else{
+      return res.send({"status" : "Error","Message" : "No user found" }); 
+    } 
 });
-
 // Edit user
 app.post('/users/edit/:id',function(req,res){
     let id  = parseInt(req.params.id);    
