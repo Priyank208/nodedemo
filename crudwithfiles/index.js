@@ -8,7 +8,7 @@ app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
   extended: true
 }));
 
-var users = '';
+var users = [];
 
 fs.readFile('user.json', (err, data) => {  
     if (err) throw err;
@@ -41,7 +41,7 @@ app.get('/users/delete/:id',function(req,res){
       var json = JSON.stringify(users);
       fs.writeFile("user.json", json, function(err) {
           if(err) {
-              return res.send({"status" : "Fail","error" : err });  
+            return res.send({"status" : "Fail","error" : err });  
           }else{
             return res.send({"status" : "Success","data" : users });  
           }
@@ -67,24 +67,38 @@ app.post('/users/edit/:id',function(req,res){
         }else{
           return res.send({"status" : "Success","data" : users });  
         }
-    });    
+    });
 });
 
 // Add new user
 app.post('/users/add',function(req,res){    
-    let newid = users.length  + parseInt(1);
-    users.push({"id":newid,"name":req.body.name,"username":req.body.username,"email":req.body.email});    
-    var json = JSON.stringify(users);
-    fs.writeFile("user.json", json, function(err) {
-        if(err) {
-            return res.send({"status" : "Fail","error" : err });  
-        }else{
-          return res.send({"status" : "Success","data" : users });  
-        }
-    });
+    let req_param = req.body;
+    req_param['id'] = users.length  + parseInt(1);
+    users.push(req_param);    
+    if(!writeJsondata()){
+      return res.send({"status" : "Success","data" : users });  
+    }else{
+      return res.send({"status" : "Fail","error" : result});  
+    }
 });
 
+var writeJsondata = () => { 
+  var json = JSON.stringify(users);
+  fs.writeFile("user1.json", json, function(err) {
+      if (err) return err;
+  });
+} 
+
+/*var writeJsondata(userdata){
+
+  var json = JSON.stringify(userdata);
+  fs.writeFile("user.json", json, function(err) {
+    if (err) throw err;
+    
+  });
+}*/
+
 //start Server
-var server = app.listen(3000,function(){
+var server = app.listen(3001,function(){
    console.log("Listening to port %s",server.address().port);
 });
